@@ -1,0 +1,8 @@
+#/bin/bash
+#filter messages of creation or deletion of temporary files e.g. from editors
+msg=`echo "$1" | grep -v -f 'cw_filter_pattern' | cut -f5- -d ' ' `
+#starting timer for snapshot
+if [ $msg ]
+then
+	./cw_timer "$msg" &
+fi

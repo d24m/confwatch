@@ -1,0 +1,34 @@
+#!/bin/bash
+source cw.conf
+FILES=$1
+export GIT_WORK_TREE=$DIR
+export GIT_DIR=".$DIR/.git"
+echo "$FILES"
+
+if ! [ -d .$DIR/.git ]
+then
+	echo "git existiert nicht in .$DIR/.git"
+	mkdir -pv ".$DIR"
+	git init 
+	git add --ignore-errors .
+else
+	for f in $FILES;
+	do
+		echo "$f"
+		file=`echo $f | sed -e "s#$DIR/##"`
+		echo $file
+		git add --ignore-errors $file
+	done
+fi
+GIT_STATUS=`git status -s`
+DATE=`date` 
+GIT_COMMIT=`git commit -m "$DATE"`
+
+REPORT="Files changed:\n$FILES\n\ngit commit:\n$GIT_COMMIT"
+
+HOST=`hostname`
+echo -e "$REPORT"
+if [ -n "$MAIL" ]
+then
+	echo -e "$REPORT" | mail -s "Files changed in $DIR on $HOST" $MAIL
+fi

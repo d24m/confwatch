@@ -1,0 +1,24 @@
+#!/bin/bash
+lines=0
+#write changed file to log
+echo "$1" >> msg.log
+#if a timer exitsts -> exit
+if [ $(wc -l msg.log | cut -f 1 -d ' ') -gt 1 ]
+then
+	exit 0
+fi
+
+#wait until nothing changed in the last 10 seconds
+while [ $(wc -l msg.log | cut -f 1 -d ' ') -ne $lines ]
+do
+	lines=`wc -l msg.log | cut -f 1 -d ' '`
+	sleep 10
+done
+#list changed files
+msg_files=`sort msg.log | uniq`
+#delete logfile
+rm msg.log
+
+#create a snapshot of changes
+./cw_snap "$msg_files"
+
